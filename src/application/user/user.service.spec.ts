@@ -5,8 +5,6 @@ import { TypeOrmUserRepository } from '../../infrastructure/persistence/reposito
 describe('UserService', () => {
   let service: UserService;
   let repository: TypeOrmUserRepository;
-
-  // Creamos un mock del repositorio para no tocar la base de datos real
   const mockUserRepository = {
     create: jest.fn(),
     findAll: jest.fn(),

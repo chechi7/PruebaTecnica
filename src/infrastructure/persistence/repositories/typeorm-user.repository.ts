@@ -19,7 +19,6 @@ export class TypeOrmUserRepository {
     return await this.repository.find();
   }
 
-  // ESTA ES LA PIEZA QUE FALTA:
   async findById(id: string): Promise<UserOrmEntity | null> {
     return await this.repository.findOne({ where: { id } });
   }

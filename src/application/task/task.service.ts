@@ -10,22 +10,20 @@ export class TaskService {
     private readonly userRepository: TypeOrmUserRepository,
   ) {}
 
+  // MÉTODO: CREAR TAREA
   async create(createTaskDto: CreateTaskDto) {
-    // 1. Validar existencia de usuario
     const user = await this.userRepository.findById(createTaskDto.userId);
     if (!user) {
       throw new NotFoundException(`El usuario con ID ${createTaskDto.userId} no existe`);
     }
 
-    // Usamos una lógica que ignore strings vacíos "" para que todo sea automático
+    // PREPARACIÓN DE LA TAREA
     const taskData = {
       title: createTaskDto.title,
       description: createTaskDto.description,
-      // Si status no existe o es un string vacío, ponemos 'PENDING'
       status: (createTaskDto.status && createTaskDto.status.trim() !== '') 
         ? createTaskDto.status 
         : 'PENDING',
-      // Si dueDate no existe o es un string vacío, generamos la fecha actual automáticamente
       dueDate: (createTaskDto.dueDate && createTaskDto.dueDate.trim() !== '') 
         ? new Date(createTaskDto.dueDate) 
         : new Date(),
@@ -35,19 +33,21 @@ export class TaskService {
     return await this.taskRepository.create(taskData);
   }
 
+  // MÉTODO: OBTENER TAREAS ACTIVAS
   async getTasksByUser(userId: string, status?: string) {
     return await this.taskRepository.findByUserId(userId, status);
   }
 
+  // MÉTODO: OBTENER TAREAS ELIMINADAS
   async getDeletedTasks(userId: string) {
     const user = await this.userRepository.findById(userId);
     if (!user) {
       throw new NotFoundException(`El usuario con ID ${userId} no existe`);
     }
-
     return await this.taskRepository.findDeletedByUserId(userId);
   }
   
+  // MÉTODO: ACTUALIZAR ESTADO
   async updateStatus(id: string, status: string) {
     const task = await this.taskRepository.update(id, { status } as any);
     if (!task) {
@@ -56,6 +56,7 @@ export class TaskService {
     return task;
   }
 
+  // MÉTODO: ELIMINAR TAREA
   async remove(id: string) {
     await this.taskRepository.softDelete(id);
     return { 

@@ -6,7 +6,6 @@ export class UserService {
   constructor(private readonly userRepository: TypeOrmUserRepository) {}
 
   async create(name: string, email: string) {
-    // Aquí podrías poner lógica de negocio, como validar si el email ya existe
     return await this.userRepository.create(name, email);
   }
 

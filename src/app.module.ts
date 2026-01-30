@@ -9,6 +9,7 @@ import { UserService } from './application/user/user.service';
 import { TaskService } from './application/task/task.service';
 import { UserController } from './infrastructure/controllers/user.controller';
 import { TaskController } from './infrastructure/controllers/task.controller';
+import { AuthModule } from './infrastructure/auth/auth.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { TaskController } from './infrastructure/controllers/task.controller';
       autoLoadEntities: true, 
     }),
     TypeOrmModule.forFeature([UserOrmEntity, TaskOrmEntity]),
+    AuthModule,
   ],
   controllers: [UserController, TaskController],
   providers: [

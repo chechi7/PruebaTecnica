@@ -1,16 +1,31 @@
-import { Controller, Get, Post, Body, Param, Delete, Query, Patch } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Param, Delete, Query, Patch, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiBearerAuth } from '@nestjs/swagger';
 import { TaskService } from '../../application/task/task.service';
 import { CreateTaskDto } from '../dtos/create-task.dto';
 import { UpdateTaskStatusDto } from '../dtos/update-task-status.dto';
+import { AuthService } from '../auth/auth.service';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
-@ApiTags('Tasks') // Cambiado a Mayúscula para mantener el orden en Swagger
+@ApiTags('Tasks')
+@ApiBearerAuth('access-token')
 @Controller('tasks')
 export class TaskController {
-  constructor(private readonly taskService: TaskService) {}
+  constructor(
+    private readonly taskService: TaskService,
+    private readonly authService: AuthService,
+  ) {}
+
+  // --- ENDPOINT TEMPORAL PARA PRUEBAS ---
+  @Get('auth/seed-token')
+  @ApiOperation({ summary: 'GENERAR TOKEN DE PRUEBA (Temporal)' })
+  getToken() {
+    return this.authService.generateTokenForTesting();
+  }
+  // ---------------------------------------
 
   @Post()
-  @ApiOperation({ summary: 'Crear una nueva tarea' })
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({ summary: 'Crear una nueva tarea (REQUIERE TOKEN)' })
   create(@Body() createTaskDto: CreateTaskDto) {
     return this.taskService.create(createTaskDto);
   }
@@ -21,13 +36,11 @@ export class TaskController {
     return this.taskService.getTasksByUser(userId, status);
   }
 
-  // --- NUEVO ENDPOINT AÑADIDO ---
   @Get('user/:userId/deleted')
   @ApiOperation({ summary: 'Obtener historial de tareas eliminadas (Soft Delete)' })
   getDeleted(@Param('userId') userId: string) {
     return this.taskService.getDeletedTasks(userId);
   }
-  // ------------------------------
 
   @Patch(':id/status')
   @ApiOperation({ summary: 'Actualizar el estado de una tarea' })

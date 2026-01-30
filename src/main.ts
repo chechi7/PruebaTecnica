@@ -10,6 +10,17 @@ async function bootstrap() {
     .setTitle('Task Manager API')
     .setDescription('Prueba Técnica - Gestión de Tareas con Arquitectura Hexagonal')
     .setVersion('1.0')
+    .addBearerAuth(
+      {
+        type: 'http',
+        scheme: 'bearer',
+        bearerFormat: 'JWT',
+        name: 'JWT',
+        description: 'Ingresa tu token JWT',
+        in: 'header',
+      },
+      'access-token',
+    )
     .build();
   
   const document = SwaggerModule.createDocument(app, config);
@@ -17,6 +28,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document, {
     swaggerOptions: {
       defaultModelsExpandDepth: -1,
+      persistAuthorization: true,
     },
   });
 
